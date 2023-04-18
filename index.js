@@ -25,153 +25,149 @@ const db = mysql.createConnection(
 
 //inquirer start, ask user how to start
 
-function start () {
+function start() {
   inquirer
-  .prompt([
-    {
-      type: "list",
-      name: "task",
-      message: "What would you like to do?",
-      choices: [
-        "View all departments",
-        "View all roles",
-        "View all employees",
-        "Add a department",
-        "Add a role",
-        'Add an employee',
-        'Update an employee role',
-        "Exit",
-      ],
-    },
-  ])
-  .then((answer) => {
-    switch (answer.task) {
-      case "View all departments":
-        viewDepartments();
-        break;
-
-      case "View all roles":
-        viewRoles();
-        break;
-
-      case "View all employees":
-        viewEmployees();
-        break;
-
-      case "Add a department":
-        addDepartment();
-        break;
-
-      case "Add a role":
-        addRole();
-        break;
-
-      case "Add an employee":
-        addEmployee();
-        break;
-
-      case "Update an employee's role":
-        updateEmployeeRole();
-        break;
-
-      case "Delete an employee":
-        deleteEmployee();
-        break;
-
-      case "View employees by manager":
-        viewEmployeesByManager();
-        break;
-
-      case "Exit":
-        console.log("Goodbye!");
-        process.exit();
-
-      default:
-        console.log(`Invalid action: ${answer.action}`);
-        start();
-        break;
-    }
-  });
+    .prompt([
+      {
+        type: "list",
+        name: "task",
+        message: "What would you like to do?",
+        choices: [
+          "View all departments",
+          "View all roles",
+          "View all employees",
+          "Add a department",
+          "Add a role",
+          "Add an employee",
+          "Update an employee role",
+          "Exit",
+        ],
+      },
+    ])
+    .then((answer) => {
+      switch (answer.task) {
+        case "View all departments":
+          viewDepartments();
+          break;
+        case "View all roles":
+          viewRoles();
+          break;
+        case "View all employees":
+          viewEmployees();
+          break;
+        case "Add a department":
+          addDepartment();
+          break;
+        case "Add a role":
+          addRole();
+          break;
+        case "Add an employee":
+          addEmployee();
+          break;
+        case "Update an employee's role":
+          updateEmployeeRole();
+          break;
+        case "Delete an employee":
+          deleteEmployee();
+          break;
+        case "View employees by manager":
+          viewEmployeesByManager();
+          break;
+        case "Exit":
+          console.log("Goodbye!");
+          process.exit();
+        default:
+          console.log(`Invalid action: ${answer.action}`);
+          start();
+          break;
+      }
+    });
 }
-  
+
 //create a new employee function (post)
 function createEmployee() {
-  inquirer.prompt([
-    {
-      type: 'input',
-      name: 'firstName',
-      message: 'Enter employee first name:',
-    },
-    {
-      type: 'input',
-      name: 'lastName',
-      message: 'Enter employee last name:',
-    },
-    {
-      type: 'input',
-      name: 'roleId',
-      message: 'Enter employee role id:',
-    },
-    {
-      type: 'input',
-      name: 'departmentId',
-      message: 'Enter employee department id:',
-    },
-  ]).then((answer) => {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "firstName",
+        message: "Enter employee first name:",
+      },
+      {
+        type: "input",
+        name: "lastName",
+        message: "Enter employee last name:",
+      },
+      {
+        type: "input",
+        name: "roleId",
+        message: "Enter employee role id:",
+      },
+      {
+        type: "input",
+        name: "departmentId",
+        message: "Enter employee department id:",
+      },
+    ])
+    .then((answer) => {
       const sql = `INSERT INTO employees (first_name, last_name, role_id, department_id, manager_id) VALUES (?, ?, ?, ?, ?)`;
-      db.query(sql, [answer.firstName, answer.lastName, answer.roleId, answer.managerId], (err, rows) => {
-        if (err) {
-          console.log(err);
+      db.query(
+        sql,
+        [answer.firstName, answer.lastName, answer.roleId, answer.managerId],
+        (err, rows) => {
+          if (err) {
+            console.log(err);
             return;
-        } else {
-          console.log(`Employee ${answer.firstName} ${answer.lastName} created`);
-          console.table(rows);
-          start();
+          } else {
+            console.log(
+              `Employee ${answer.firstName} ${answer.lastName} created`
+            );
+            console.table(rows);
+            start();
+          }
         }
-      });
-    })
+      );
+    });
 }
-
-
 
 //read the database and view employees, roles, and departments (get)
 function viewData() {
-  inquirer.prompt([
-    {
-      type: 'list',
-      name: 'task',
-      message: 'What would you like to view?',
-      choices: [
-        'View all employees',
-        'View all roles',
-        'View all departments',
-        'View employees by department',
-        'View employees by manager'
-      ]
-    }
-  ]).then((answer) => {
-    switch (answer.action) {
-      case "View all employees":
-        const sql = `SELECT * FROM employees`;
-        db.query(sql, (err, rows) => {
-          if (err) {
-            res.status(500).json({ error: err.message });
-             return;
-          }
-          res.json({
-            message: 'success',
-            data: rows
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        name: "task",
+        message: "What would you like to view?",
+        choices: [
+          "View all employees",
+          "View all roles",
+          "View all departments",
+          "View employees by department",
+          "View employees by manager",
+        ],
+      },
+    ])
+    .then((answer) => {
+      switch (answer.action) {
+        case "View all employees":
+          const sql = `SELECT * FROM employees`;
+          db.query(sql, (err, rows) => {
+            if (err) {
+              res.status(500).json({ error: err.message });
+              return;
+            }
+            res.json({
+              message: "success",
+              data: rows,
+            });
           });
-        });
-        break;
-      case "Create a new employee":
-        createEmployee();
-        break;
-
-    }
-  })
-
-};
+          break;
+        case "Create a new employee":
+          createEmployee();
+          break;
+      }
+    });
+}
 //delete an employee from database (delete)
 //update info for an employee (update)
 //view employee by manager (get)
