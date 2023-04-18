@@ -33,35 +33,63 @@ function start () {
       name: "task",
       message: "What would you like to do?",
       choices: [
-        "Create a new employee",
-        "View employees, roles, and departments",
-        "Delete an employee",
-        "Update employee information",
-        "View employees by manager",
+        "View all departments",
+        "View all roles",
+        "View all employees",
+        "Add a department",
+        "Add a role",
+        'Add an employee',
+        'Update an employee role',
         "Exit",
       ],
     },
   ])
   .then((answer) => {
     switch (answer.task) {
-      case "Create a new employee":
-        createEmployee();
+      case "View all departments":
+        viewDepartments();
         break;
-      case "View employees, roles, and departments":
-        viewData();
+
+      case "View all roles":
+        viewRoles();
         break;
+
+      case "View all employees":
+        viewEmployees();
+        break;
+
+      case "Add a department":
+        addDepartment();
+        break;
+
+      case "Add a role":
+        addRole();
+        break;
+
+      case "Add an employee":
+        addEmployee();
+        break;
+
+      case "Update an employee's role":
+        updateEmployeeRole();
+        break;
+
       case "Delete an employee":
         deleteEmployee();
         break;
-      case "Update employee information":
-        updateEmployee();
-        break;
+
       case "View employees by manager":
-        viewByManager();
+        viewEmployeesByManager();
         break;
+
       case "Exit":
         console.log("Goodbye!");
         process.exit();
+
+      default:
+        console.log(`Invalid action: ${answer.action}`);
+        start();
+        break;
     }
   });
 }
@@ -90,31 +118,24 @@ function createEmployee() {
       message: 'Enter employee department id:',
     },
   ]).then((answer) => {
-    switch (answer.action) {
-      case "View all employees":
-        const sql = `SELECT * FROM employees`;
-        db.query(sql, (err, rows) => {
-          if (err) {
-            res.status(500).json({ error: err.message });
-             return;
-          }
-          res.json({
-            message: 'success',
-            data: rows
-          });
-        });
-        break;
-      case "Create a new employee":
-        createEmployee();
-        break;
+      const sql = `INSERT INTO employees (first_name, last_name, role_id, department_id, manager_id) VALUES (?, ?, ?, ?, ?)`;
+      db.query(sql, [answer.firstName, answer.lastName, answer.roleId, answer.managerId], (err, rows) => {
+        if (err) {
+          console.log(err);
+            return;
+        } else {
+          console.log(`Employee ${answer.firstName} ${answer.lastName} created`);
+          console.table(rows);
+          start();
+        }
+      });
+    })
+}
 
-    }
-  })
 
-};
 
 //read the database and view employees, roles, and departments (get)
-function createEmployee() {
+function viewData() {
   inquirer.prompt([
     {
       type: 'list',
