@@ -3,7 +3,6 @@ const express = require("express");
 const mysql = require("mysql2");
 const PORT = process.env.PORT || 3001;
 require("dotenv").config();
-console.log(process.env.DB_PW);
 const inquirer = require("inquirer");
 
 const app = express();
@@ -109,7 +108,7 @@ function addEmployee() {
         console.error(err);
         return;
       }
-      //conver roles to array
+      //convert managers to array
       const managerChoices = managers.map((manager) => ({
         name: manager.name,
         value: manager.id,
@@ -136,13 +135,14 @@ function addEmployee() {
           },
           {
             type: "list",
-            name: "isManager",
+            name: "managerId",
             message: "Who is the employee's manager?",
             choices: managerChoices,
           },
         ])
         .then((answer) => {
-          const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
+          console.table(answer);
+          const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
           db.query(
             sql,
             [
@@ -157,9 +157,8 @@ function addEmployee() {
                 return;
               } else {
                 console.log(
-                  `Employee ${answer.firstName} ${answer.lastName} created`
+                  `Added ${answer.firstName} ${answer.lastName} to the database`
                 );
-                console.table(rows);
                 start();
               }
             }
