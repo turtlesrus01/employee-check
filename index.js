@@ -89,33 +89,43 @@ function start() {
 }
 
 //create a new employee function (post)
-function createEmployee() {
+function addEmployee() {
+  //db connect for populate lists
+  const roleQuery = 'SELECT id, title FROM role';
+  db.query(roleQuery, (err, roles) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    //conver roles to array
+    const roleChoices = roles.map((role) => ({
+      name: role.title,
+      value: role.id,
+    }))
+  });
+  //new employee prompt
   inquirer
     .prompt([
       {
         type: "input",
         name: "firstName",
-        message: "Enter employee first name:",
+        message: "What is the employee's first name?",
       },
       {
         type: "input",
         name: "lastName",
-        message: "Enter employee last name:",
+        message: "What is the employee's last name?",
       },
       {
-        type: "input",
+        type: "list",
         name: "roleId",
-        message: "Enter employee role id:",
+        message: "What is the employee's role?",
+        choice: roleChoices
       },
       {
-        type: "input",
-        name: "departmentId",
-        message: "Enter employee department id:",
-      },
-      {
-        type: "confirm",
+        type: "list",
         name: "isManager",
-        message: "Is the employee a manager?",
+        message: "Who is the employee's manager?",
         default: false,
       },
     ])
@@ -123,7 +133,7 @@ function createEmployee() {
       const sql = `INSERT INTO employees (first_name, last_name, role_id, department_id, manager_id) VALUES (?, ?, ?, ?, ?)`;
       db.query(
         sql,
-        [answer.firstName, answer.lastName, answer.roleId, answer.managerId],
+        [answer.firstName, answer.lastName, answer.roleId, answer.isManager],
         (err, rows) => {
           if (err) {
             console.log(err);

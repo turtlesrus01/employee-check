@@ -16,7 +16,7 @@ CREATE TABLE department (
 /*role table holds the names of roles, salaries for this role and the department its contained in*/
 CREATE TABLE role (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(30) NOT NULL,
+  title VARCHAR(30) NOT NULL UNIQUE,
   salary DECIMAL NOT NULL,
   department_id INT,
   FOREIGN KEY (department_id)
