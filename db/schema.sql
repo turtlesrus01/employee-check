@@ -6,7 +6,7 @@ USE employees_db;
 /*manager table holds the names and ids of the managers*/
 CREATE TABLE manager (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(30) NOT NULL
+  name VARCHAR(30) NOT NULL UNIQUE
 );
 /*department table holds the names and ids of all departments*/
 CREATE TABLE department (
@@ -31,7 +31,7 @@ CREATE TABLE employee (
   manager_id INT,
   role_id INT,
   FOREIGN KEY (manager_id)
-    REFERENCES employee(id)
+    REFERENCES manager(id)
     ON DELETE SET NULL,
   FOREIGN KEY (role_id)
     REFERENCES role(id)
