@@ -35,8 +35,8 @@ function start() {
           "View all departments",
           "View all roles",
           "View all employees",
-          'View employees by manager',
-          'View employees by department',
+          "View employees by manager",
+          "View employees by department",
           "Add a department",
           "Add a role",
           "Add an employee",
@@ -56,7 +56,7 @@ function start() {
         case "View all employees":
           viewEmployees();
           break;
-        case 'View employees by department':
+        case "View employees by department":
           viewEmployeesByDepartment();
           break;
         case "Add a department":
@@ -206,7 +206,11 @@ function viewDepartments() {
 }
 //function that dispays all role data
 function viewRoles() {
-  const rView = `SELECT * FROM role`;
+  const rView = `SELECT role.title, role.id ,role.salary, department.name
+  FROM role 
+  INNER JOIN department
+    ON role.department_id = department.id
+  ORDER BY department.name`;
   db.query(rView, (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -217,7 +221,7 @@ function viewRoles() {
   });
 }
 //function that dispays all employee data sorted by manager
-function viewEmployeesByManager(){
+function viewEmployeesByManager() {
   const edView = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name , role.salary, manager.name
   FROM employee 
   INNER JOIN role
@@ -235,7 +239,7 @@ function viewEmployeesByManager(){
     console.table(rows);
     start();
   });
-};
+}
 //function that dispays all employee data sorted by department
 function viewEmployeesByDepartment() {
   const edView = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name , role.salary, manager.name
@@ -259,7 +263,6 @@ function viewEmployeesByDepartment() {
 
 //delete an employee from database (delete)
 //update info for an employee (update)
-//view employee by manager (get)
 
 //call the first prompt
 start();
