@@ -35,6 +35,8 @@ function start() {
           "View all departments",
           "View all roles",
           "View all employees",
+          'View employees by manager',
+          'View employees by department',
           "Add a department",
           "Add a role",
           "Add an employee",
@@ -53,6 +55,9 @@ function start() {
           break;
         case "View all employees":
           viewEmployees();
+          break;
+        case 'View employees by department':
+          viewEmployeesByDepartment();
           break;
         case "Add a department":
           addDepartment();
@@ -168,44 +173,90 @@ function addEmployee() {
   });
 }
 
-//read the database and view employees, roles, and departments (get)
-function viewData() {
-  inquirer
-    .prompt([
-      {
-        type: "list",
-        name: "task",
-        message: "What would you like to view?",
-        choices: [
-          "View all employees",
-          "View all roles",
-          "View all departments",
-          "View employees by department",
-          "View employees by manager",
-        ],
-      },
-    ])
-    .then((answer) => {
-      switch (answer.action) {
-        case "View all employees":
-          const sql = `SELECT * FROM employees`;
-          db.query(sql, (err, rows) => {
-            if (err) {
-              res.status(500).json({ error: err.message });
-              return;
-            }
-            res.json({
-              message: "success",
-              data: rows,
-            });
-          });
-          break;
-        case "Create a new employee":
-          createEmployee();
-          break;
-      }
-    });
+//function that dispays all employee data
+function viewEmployees() {
+  const eView = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name , role.salary, manager.name
+  FROM employee 
+  INNER JOIN role
+    ON employee.role_id = role.id
+  LEFT JOIN department
+    ON role.department_id = department.id
+  LEFT JOIN manager
+    ON employee.manager_id = manager.id`;
+  db.query(eView, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    console.table(rows);
+    start();
+  });
 }
+//function that displays departments
+function viewDepartments() {
+  const dView = `SELECT * FROM department`;
+  db.query(dView, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    console.table(rows);
+    start();
+  });
+}
+//function that dispays all role data
+function viewRoles() {
+  const rView = `SELECT * FROM role`;
+  db.query(rView, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    console.table(rows);
+    start();
+  });
+}
+//function that dispays all employee data sorted by manager
+function viewEmployeesByManager(){
+  const edView = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name , role.salary, manager.name
+  FROM employee 
+  INNER JOIN role
+    ON employee.role_id = role.id
+  LEFT JOIN department
+    ON role.department_id = department.id
+  LEFT JOIN manager
+    ON employee.manager_id = manager.id
+  ORDER BY manager.name`;
+  db.query(edView, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    console.table(rows);
+    start();
+  });
+};
+//function that dispays all employee data sorted by department
+function viewEmployeesByDepartment() {
+  const edView = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name , role.salary, manager.name
+  FROM employee 
+  INNER JOIN role
+    ON employee.role_id = role.id
+  LEFT JOIN department
+    ON role.department_id = department.id
+  LEFT JOIN manager
+    ON employee.manager_id = manager.id
+  ORDER BY department.name`;
+  db.query(edView, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    console.table(rows);
+    start();
+  });
+}
+
 //delete an employee from database (delete)
 //update info for an employee (update)
 //view employee by manager (get)
