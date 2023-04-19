@@ -328,7 +328,14 @@ function viewEmployeesByDepartment() {
 }
 
 //delete an employee from database (delete)
+  //query to populate employees in choices
+  //inquirer call to ask which employee to delete
+    //database call to delete employees_db 
+    
 //update info for an employee (update)
+  //query to populate employees in choices
+  //inquirer call to ask which employee to update
+    //database call to update employees_db 
 
 //call the first prompt
 start();
