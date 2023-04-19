@@ -2,9 +2,9 @@
 const express = require("express");
 const mysql = require("mysql2");
 const PORT = process.env.PORT || 3001;
-const dotenv = require("dotenv");
-const { default: inquirer } = require("inquirer");
-dotenv.config();
+require('dotenv').config();
+console.log(process.env.DB_PW)
+const inquirer = require('inquirer');
 
 const app = express();
 
@@ -17,7 +17,7 @@ const db = mysql.createConnection(
   {
     host: "localhost",
     user: "root",
-    password: process.env.DB_PW,
+    password: `${process.env.DB_PW}`,
     database: "employees_db",
   },
   console.log("Connected to the employees_db database.")
@@ -77,10 +77,14 @@ function start() {
           console.log("Goodbye!");
           process.exit();
         default:
-          console.log(`Invalid action: ${answer.action}`);
+          console.log(`Invalid action: ${answer.task}`);
           start();
           break;
       }
+    })
+    .catch((error) => {
+      console.error(error);
+      process.exit();
     });
 }
 
@@ -107,6 +111,12 @@ function createEmployee() {
         type: "input",
         name: "departmentId",
         message: "Enter employee department id:",
+      },
+      {
+        type: "confirm",
+        name: "isManager",
+        message: "Is the employee a manager?",
+        default: false,
       },
     ])
     .then((answer) => {
@@ -171,3 +181,6 @@ function viewData() {
 //delete an employee from database (delete)
 //update info for an employee (update)
 //view employee by manager (get)
+
+//call the first prompt
+start();
