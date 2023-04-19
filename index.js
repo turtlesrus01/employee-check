@@ -106,7 +106,7 @@ function addEmployee() {
       name: role.title,
       value: role.id,
     }));
-    //db connect for populate role list
+    //db connect for populate manager list
     const managerQuery = "SELECT id, name FROM manager";
     db.query(managerQuery, (err, managers) => {
       if (err) {
@@ -172,6 +172,72 @@ function addEmployee() {
     });
   });
 }
+
+//function to add a role
+function addRole(){
+  //db connect for populate department list
+  const dQuery = "SELECT name, id FROM department";
+  db.query(dQuery, (err, departments) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    //convert roles to array
+    const departmentChoices = departments.map((department) => ({
+      name: department.name,
+      value: department.id,
+    }));
+
+    //inquirer prompt for role columns
+    inquirer
+            .prompt([
+              {
+                type: "input",
+                name: "title",
+                message: "What is the role's title?",
+              },
+              {
+                type: "input",
+                name: "salary",
+                message: "What is the role's salary?",
+              },
+              {
+                type: "list",
+                name: "departmentId",
+                message: "What is the role's department?",
+                choices: departmentChoices,
+              },
+            ])
+    .then((answer) => {
+      //console.table(answer.departmentId);
+          const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
+          db.query(
+            sql,
+            [
+              answer.title,
+              answer.salary,
+              answer.departmentId,
+            ],
+            (err, rows) => {
+              //error handler
+              if (err) {
+                console.error(err);
+                return;
+              } else {
+                //success log to console
+                console.log(
+                  `Added ${answer.title} role to the database`
+                );
+                start();
+              }
+            }
+          );
+    });
+  });
+}     
+    
+
+
 
 //function that dispays all employee data
 function viewEmployees() {
