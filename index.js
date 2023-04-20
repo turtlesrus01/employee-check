@@ -41,7 +41,7 @@ function start() {
           "Add a role",
           "Add an employee",
           "Update an employee role",
-          'Delete an employee',
+          "Delete an employee",
           "Exit",
         ],
       },
@@ -172,6 +172,33 @@ function addEmployee() {
         });
     });
   });
+}
+
+//function to add a department
+function addDepartment() {
+  // inquirer prompt for department name
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "name",
+        message: "What is the department's name?",
+      },
+    ])
+    .then((answer) => {
+      const sql = `INSERT INTO department (name) VALUES (?)`;
+      db.query(sql, [answer.name], (err, rows) => {
+        //error handler
+        if (err) {
+          console.error(err);
+          return;
+        } else {
+          //success log to console
+          console.log(`Added ${answer.name} department to the database`);
+          start();
+        }
+      });
+    });
 }
 
 //function to add a role
@@ -321,7 +348,7 @@ function viewEmployeesByDepartment() {
 
 //delete an employee from database (delete)
 function deleteEmployee() {
-//query to populate employees in choices
+  //query to populate employees in choices
   const eQuery = `SELECT id, employee.first_name, employee.last_name
   FROM employee`;
   db.query(eQuery, (err, employees) => {
@@ -336,34 +363,33 @@ function deleteEmployee() {
       value: employee.id,
     }));
     //inquirer call to ask which employee to delete
-    inquirer.
-    prompt([
-      {
-        type: "list",
-        name: "employee",
-        message: "Which employee needs to be deleted?",
-        choices: employeeChoices,
-      },
-    ]).then((answer) => {
-      const sql = `DELETE FROM employee
-      WHERE id = ?`
-      //database call to update employees_db
-      db.query(sql, [answer.employee], (err, rows) => {
-        //error handler
-        if (err) {
-          console.error(err);
-          return;
-        } else {
-          //success log to console
-          console.log(`Deleted employee from database`);
-          start();
-        }
-      });  
-    })
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employee",
+          message: "Which employee needs to be deleted?",
+          choices: employeeChoices,
+        },
+      ])
+      .then((answer) => {
+        const sql = `DELETE FROM employee
+      WHERE id = ?`;
+        //database call to update employees_db
+        db.query(sql, [answer.employee], (err, rows) => {
+          //error handler
+          if (err) {
+            console.error(err);
+            return;
+          } else {
+            //success log to console
+            console.log(`Deleted employee from database`);
+            start();
+          }
+        });
+      });
   });
-};
-
-
+}
 
 //update info for an employee (update)
 function updateEmployeeRole() {
@@ -424,7 +450,9 @@ WHERE id = ?;`;
               return;
             } else {
               //success log to console
-              console.log(`Updated employee ${answer.employee} with new role ${answer.newRole}`);
+              console.log(
+                `Updated employee ${answer.employee} with new role ${answer.newRole}`
+              );
               start();
             }
           });
