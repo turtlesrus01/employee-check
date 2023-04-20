@@ -68,7 +68,7 @@ function start() {
         case "Add an employee":
           addEmployee();
           break;
-        case "Update an employee's role":
+        case "Update an employee role":
           updateEmployeeRole();
           break;
         case "Delete an employee":
@@ -174,7 +174,7 @@ function addEmployee() {
 }
 
 //function to add a role
-function addRole(){
+function addRole() {
   //db connect for populate department list
   const dQuery = "SELECT name, id FROM department";
   db.query(dQuery, (err, departments) => {
@@ -190,54 +190,45 @@ function addRole(){
 
     //inquirer prompt for role columns
     inquirer
-            .prompt([
-              {
-                type: "input",
-                name: "title",
-                message: "What is the role's title?",
-              },
-              {
-                type: "input",
-                name: "salary",
-                message: "What is the role's salary?",
-              },
-              {
-                type: "list",
-                name: "departmentId",
-                message: "What is the role's department?",
-                choices: departmentChoices,
-              },
-            ])
-    .then((answer) => {
-      //console.table(answer.departmentId);
-          const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
-          db.query(
-            sql,
-            [
-              answer.title,
-              answer.salary,
-              answer.departmentId,
-            ],
-            (err, rows) => {
-              //error handler
-              if (err) {
-                console.error(err);
-                return;
-              } else {
-                //success log to console
-                console.log(
-                  `Added ${answer.title} role to the database`
-                );
-                start();
-              }
+      .prompt([
+        {
+          type: "input",
+          name: "title",
+          message: "What is the role's title?",
+        },
+        {
+          type: "input",
+          name: "salary",
+          message: "What is the role's salary?",
+        },
+        {
+          type: "list",
+          name: "departmentId",
+          message: "What is the role's department?",
+          choices: departmentChoices,
+        },
+      ])
+      .then((answer) => {
+        //console.table(answer.departmentId);
+        const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
+        db.query(
+          sql,
+          [answer.title, answer.salary, answer.departmentId],
+          (err, rows) => {
+            //error handler
+            if (err) {
+              console.error(err);
+              return;
+            } else {
+              //success log to console
+              console.log(`Added ${answer.title} role to the database`);
+              start();
             }
-          );
-    });
+          }
+        );
+      });
   });
-}     
-    
-
-
+}
 
 //function that dispays all employee data
 function viewEmployees() {
@@ -328,14 +319,76 @@ function viewEmployeesByDepartment() {
 }
 
 //delete an employee from database (delete)
-  //query to populate employees in choices
-  //inquirer call to ask which employee to delete
-    //database call to delete employees_db 
-    
+//query to populate employees in choices
+//inquirer call to ask which employee to delete
+//database call to delete employees_db
+
 //update info for an employee (update)
-  //query to populate employees in choices
-  //inquirer call to ask which employee to update
-    //database call to update employees_db 
+function updateEmployeeRole() {
+  //SQL query variables
+  const eQuery = `SELECT employee.id, employee.first_name, employee.last_name, role.id AS role_id, role.title
+  FROM employee
+  INNER JOIN role
+    ON employee.role_id = role.id`;
+  const rQuery = `SELECT id, title 
+  FROM role`;
+
+  db.query(eQuery, (err, employees) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    db.query(rQuery, (err, employees) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    //convert roles to array
+    const employeeChoices = employees.map((employee) => ({
+      name: [employee.first_name, employee.last_name],
+      value: employee.id,
+    }));
+    //query to populate employees in choices
+    const roleChoices = employees.map((role) => ({
+      name: role.title,
+      value: role.role_id,
+    }));
+    //inquirer call to ask which employee to update
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employee",
+          message: "Which employee needs to be updated?",
+          choices: employeeChoices,
+        },
+        {
+          type: "list",
+          name: "newRole",
+          message: "What is the updated role?",
+          choices: roleChoices,
+        },
+      ])
+      .then((answer) => {
+        const sql = `UPDATE employee 
+  SET role_id = ?
+WHERE id = ?;`;
+        //database call to update employees_db
+        db.query(sql, [answer.newRole, answer.employee], (err, rows) => {
+          //error handler
+          if (err) {
+            console.error(err);
+            return;
+          } else {
+            //success log to console
+            console.log(`Updated employee's role to ${answer.newRole}`);
+            start();
+          }
+        });
+      });
+    });
+  });
+}
 
 //call the first prompt
 start();
