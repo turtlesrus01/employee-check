@@ -343,49 +343,49 @@ function updateEmployeeRole() {
         console.error(err);
         return;
       }
-    //convert roles to array
-    const employeeChoices = employees.map((employee) => ({
-      name: [employee.first_name, employee.last_name],
-      value: employee.id,
-    }));
-    //query to populate employees in choices
-    const roleChoices = employees.map((role) => ({
-      name: role.title,
-      value: role.role_id,
-    }));
-    //inquirer call to ask which employee to update
-    inquirer
-      .prompt([
-        {
-          type: "list",
-          name: "employee",
-          message: "Which employee needs to be updated?",
-          choices: employeeChoices,
-        },
-        {
-          type: "list",
-          name: "newRole",
-          message: "What is the updated role?",
-          choices: roleChoices,
-        },
-      ])
-      .then((answer) => {
-        const sql = `UPDATE employee 
+      //convert roles to array
+      const employeeChoices = employees.map((employee) => ({
+        name: [employee.first_name, employee.last_name],
+        value: employee.id,
+      }));
+      //query to populate employees in choices
+      const roleChoices = employees.map((role) => ({
+        name: role.title,
+        value: role.role_id,
+      }));
+      //inquirer call to ask which employee to update
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "employee",
+            message: "Which employee needs to be updated?",
+            choices: employeeChoices,
+          },
+          {
+            type: "list",
+            name: "newRole",
+            message: "What is the updated role?",
+            choices: roleChoices,
+          },
+        ])
+        .then((answer) => {
+          const sql = `UPDATE employee 
   SET role_id = ?
 WHERE id = ?;`;
-        //database call to update employees_db
-        db.query(sql, [answer.newRole, answer.employee], (err, rows) => {
-          //error handler
-          if (err) {
-            console.error(err);
-            return;
-          } else {
-            //success log to console
-            console.log(`Updated employee's role to ${answer.newRole}`);
-            start();
-          }
+          //database call to update employees_db
+          db.query(sql, [answer.newRole, answer.employee], (err, rows) => {
+            //error handler
+            if (err) {
+              console.error(err);
+              return;
+            } else {
+              //success log to console
+              console.log(`Updated employee's role to ${answer.newRole}`);
+              start();
+            }
+          });
         });
-      });
     });
   });
 }
