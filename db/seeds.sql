@@ -18,4 +18,5 @@ INSERT INTO role (title, salary, department_id) VALUES ('Software Engineer', 800
 INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ('Jesse', 'Pinkman', 4, 3);
 INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ('Alice', 'Lee', 2, 2);
 INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ('David', 'Wang', 1, 3);
+INSERT INTO employee (first_name, last_name, manager_id, role_id) VALUES ('Taylor', 'Swift', 3, 1);
 

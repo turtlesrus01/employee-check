@@ -41,6 +41,7 @@ function start() {
           "Add a role",
           "Add an employee",
           "Update an employee role",
+          'Delete an employee',
           "Exit",
         ],
       },
@@ -319,9 +320,50 @@ function viewEmployeesByDepartment() {
 }
 
 //delete an employee from database (delete)
+function deleteEmployee() {
 //query to populate employees in choices
-//inquirer call to ask which employee to delete
-//database call to delete employees_db
+  const eQuery = `SELECT id, employee.first_name, employee.last_name
+  FROM employee`;
+  db.query(eQuery, (err, employees) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    //convert roles to array
+    const employeeChoices = employees.map((employee) => ({
+      name: [employee.first_name, employee.last_name],
+      value: employee.id,
+    }));
+    //inquirer call to ask which employee to delete
+    inquirer.
+    prompt([
+      {
+        type: "list",
+        name: "employee",
+        message: "Which employee needs to be deleted?",
+        choices: employeeChoices,
+      },
+    ]).then((answer) => {
+      const sql = `DELETE FROM employee
+      WHERE id = ?`
+      //database call to update employees_db
+      db.query(sql, [answer.employee], (err, rows) => {
+        //error handler
+        if (err) {
+          console.error(err);
+          return;
+        } else {
+          //success log to console
+          console.log(`Deleted employee from database`);
+          start();
+        }
+      });  
+    })
+  });
+};
+
+
 
 //update info for an employee (update)
 function updateEmployeeRole() {
@@ -332,18 +374,19 @@ function updateEmployeeRole() {
     ON employee.role_id = role.id`;
   const rQuery = `SELECT id, title 
   FROM role`;
-
+  //query to populate employees in choices
   db.query(eQuery, (err, employees) => {
     if (err) {
       console.error(err);
       return;
     }
+    //query to populate roles in choices
     db.query(rQuery, (err, roles) => {
       if (err) {
         console.error(err);
         return;
       }
-      //convert roles to array
+      //convert employees to array
       const employeeChoices = employees.map((employee) => ({
         name: [employee.first_name, employee.last_name],
         value: employee.id,
