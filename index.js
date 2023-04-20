@@ -326,9 +326,9 @@ function viewEmployeesByDepartment() {
 //update info for an employee (update)
 function updateEmployeeRole() {
   //SQL query variables
-  const eQuery = `SELECT employee.id, employee.first_name, employee.last_name, role.id AS role_id, role.title
+  const eQuery = `SELECT employee.id, employee.first_name, employee.last_name, role.title
   FROM employee
-  INNER JOIN role
+  LEFT JOIN role
     ON employee.role_id = role.id`;
   const rQuery = `SELECT id, title 
   FROM role`;
@@ -338,7 +338,7 @@ function updateEmployeeRole() {
       console.error(err);
       return;
     }
-    db.query(rQuery, (err, employees) => {
+    db.query(rQuery, (err, roles) => {
       if (err) {
         console.error(err);
         return;
@@ -349,7 +349,7 @@ function updateEmployeeRole() {
         value: employee.id,
       }));
       //query to populate employees in choices
-      const roleChoices = employees.map((role) => ({
+      const roleChoices = roles.map((role) => ({
         name: role.title,
         value: role.role_id,
       }));
@@ -381,7 +381,7 @@ WHERE id = ?;`;
               return;
             } else {
               //success log to console
-              console.log(`Updated employee's role to ${answer.newRole}`);
+              console.log(`Updated employee ${answer.employee} with new role ${answer.newRole}`);
               start();
             }
           });
